@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+
+# VSCode
+.vscode/
+
+# Backup files
+*.bak
+*.bak[0-9]
+*.new

@@ -1,0 +1,695 @@
+<html><head>
+	 	<link rel="icon" type="image/png" href="/favicon.png">
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<title>PartyPad</title>
+		<script>
+document.addEventListener('dblclick', function(e) {
+				e.preventDefault();
+			});
+			
+			document.addEventListener("selectionchange", () => {
+				if (window.getSelection) {
+					window.getSelection().removeAllRanges();
+				}
+			});
+
+			document.addEventListener("contextmenu", (event) => {
+				event.preventDefault();
+			});
+			
+ </script>
+		<style>
+		* {
+					-webkit-user-select: none; /* Safari */
+					-moz-user-select: none;    /* Firefox */
+					-ms-user-select: none;     /* Internet Explorer/Edge */
+					user-select: none;         /* Standard */
+			}
+	
+	html {
+		overflow: hidden; /* Prevent scrolling */
+		width: 100%;    /* Ensure no overflow due to content */
+	}
+	   body {
+			font-family: Arial, sans-serif;
+			margin: 0;
+			background-color: #222;
+			color: #fff;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			overflow: hidden; /* Prevent scrolling */
+		}
+		.container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			position: relative;
+			min-width: 32px;
+			min-height: 18px;
+			height: auto;
+			width: 100%;
+			transform-origin: top left;
+			aspect-ratio: 18 / 9;
+		}
+		.thumbstick {
+			position: absolute;
+			width: 13%;
+			height: 26%;
+			background-color: #444;
+			border-radius: 50%;
+			touch-action: none;
+		}
+		.thumbstick-inner {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 70%;
+			height: 70%;
+			background-color: #888;
+			border-radius: 50%;
+		}
+		.left-thumbstick {
+			left: 30%;
+			top: 65%;
+			transform: translate(-50%, -50%);
+		}
+		.right-thumbstick {
+			right: 30%;
+			top: 65%;
+			transform: translate(50%, -50%);
+		}
+		button {
+            position: absolute;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
+            border:none;
+			font-size: 3vw;
+        	background-color: #555;
+    		color: #fff;
+    		justify-content: center;
+			align-items: center;
+		}
+		button:active {
+			filter: brightness(0.7); /* Darken by 20% */
+		}
+		.a {
+			right: 10%; /* Move right by another 50px */
+			top: 46%;
+			width: 7%;
+			height: 14%;
+			background-color: #5f5;
+			border: none;
+			border-radius: 50%;
+            color: #000;
+		}
+		.b {
+			right: 3%; /* Move right by another 50px */
+			top: 34%;
+			width: 7%;
+			height: 14%;
+			background-color: #F55;
+			border-radius: 50%;
+            color: #000;
+		}
+    	.x {
+			right: 17%; /* Move right by another 50px */
+			top: 34%;
+			width: 7%;
+			height: 14%;
+			background-color: #55F;
+			border-radius: 50%;
+            color: #000;
+		}
+		.y{
+			right: 10%; /* Move right by another 50px */
+			top: 22%;
+			width: 7%;
+			height: 14%;
+			background-color: #ff5;
+			border-radius: 50%;
+            color: #000;
+
+		}
+        
+
+        .down {
+			left: 10%; /* Move right by another 50px */
+			top: 47%;
+			width: 7%;
+			height: 14%;
+			background-color: #999;
+			border: none;
+			border-radius: 15% 15% 50% 50%;
+		}
+		.left{
+
+			left: 3%; /* Move right by another 50px */
+			top: 34%;
+			width: 7%;
+			height: 14%;
+			background-color: #999;
+	        border-radius: 50% 15% 15% 50%;
+		}
+    	.right {
+			left: 17%; /* Move right by another 50px */
+			top: 34%;
+			width: 7%;
+			height: 14%;
+			background-color: #999;
+            border-radius: 15% 50% 50% 15%;
+		
+		}
+
+		.up{
+			left: 10%; /* Move right by another 50px */
+			top: 21%;
+			width: 7%;
+			height: 14%;
+			background-color: #999;
+			border-radius: 50% 50% 15% 15% ;
+
+		}
+    	.r1{
+	        top: 11%;
+			right: 18%;
+			width: 20%;
+			height: 10%;
+			border-radius: 10px;
+		}
+        .r2{
+	        top: 24%;
+			right: 26%;
+			width: 12%;
+			height: 10%;
+			border-radius: 10px;
+		}
+        .r3{
+	        bottom: 19%;
+			right: 5%;
+			width: 10%;
+			height: 10%;
+			border-radius: 10px;
+		}
+    	.l1{
+	        top: 11%;
+			left: 18%;
+			width: 20%;
+			height: 10%;
+			border-radius: 10px;
+
+		}
+        .l2{
+	        top: 24%;
+			left: 26%;
+			width: 12%;
+			height: 10%;
+			border-radius: 10px;
+		}
+        .l3{
+	        bottom: 19%;
+			left: 5%;
+			width: 10%;
+			height: 10%;
+			border-radius: 10px;
+		}
+
+		.select-button {
+	        top: 40%;
+			left: 42%;
+			width: 14%;
+			height: 8%;
+			background-color: #555;
+			border-radius: 10px;
+			color: #fff;
+			justify-content: center;
+			align-items: center;
+			transform: translateX(-50%);
+
+		}
+        .menu-button {
+	        top: 50%;
+			left: 50%;
+			width: 10%;
+			height: 8%;
+			background-color: #555;
+			border-radius: 10px;
+			color: #fff;
+			justify-content: center;
+			align-items: center;
+			transform: translateX(-50%);
+
+		}
+		.start-button {
+			top: 40%;
+			left: 58%;
+			width: 14%;
+			height: 8%;
+			background-color: #555;
+			border-radius: 10px;
+			color: #fff;
+			justify-content: center;
+			align-items: center;
+			transform: translateX(-50%);
+
+		}
+
+		#player_number {
+			position: absolute;
+			top: 25%;
+			left: 50%;
+			transform: translateX(-50%);
+			font-size: 3vw;
+			color: #fff;
+			text-align: center;
+		}
+
+</style>
+	
+	</head><body>
+		
+	 <div class="container">
+		<div id="player_number">Player 1</div>
+		 <div class="thumbstick left-thumbstick" id="left-thumbstick">
+			<div class="thumbstick-inner" id="left-thumbstick-inner"></div>
+		</div>		<div class="thumbstick right-thumbstick" id="right-thumbstick">
+			<div class="thumbstick-inner" id="right-thumbstick-inner"></div>
+		</div>
+		<button class="a" id="a-button">A</button>      
+		<button class="b" id="b-button">B</button>
+    	<button class="x" id="x-button">X</button>      
+		<button class="y" id="y-button">Y</button>
+    	<button class="up" id="up-button"></button>      
+		<button class="down" id="down-button"></button>
+    	<button class="left" id="left-button"></button>      
+		<button class="right" id="right-button"></button>
+		<button class="start-button" id="start-button">Start</button>
+		<button class="select-button" id="select-button">Select</button>
+        <button class="r1" id="r1-button">R1</button>      
+        <button class="l1" id="l1-button">L1</button>
+        <button class="r2" id="r2-button">R2</button>
+        <button class="l2" id="l2-button">L2</button>
+        <button class="r3" id="r3-button">R3</button>
+        <button class="l3" id="l3-button">L3</button>
+        <button class="menu-button" id="menu-button">Menu</button>
+	</div>
+
+		<script>
+			
+// Add WebSocket management at the top of the script section
+let socket;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
+const RECONNECT_DELAY = 1000;
+const inputQueue = [];
+let lastSendTime = 0;
+const MIN_SEND_INTERVAL = 2; // 2ms minimum between sends
+let isReconnecting = false;
+let playerNumber = null;
+let wasReset = false; // Track if we were disconnected by reset
+
+function sendAction(action) {
+    queueInput(action);
+}
+
+function setupWebSocket() {
+    // Don't attempt connection if we were previously reset
+    if (wasReset) {
+        console.log('Connection blocked - page refresh required after reset');
+        return;
+    }
+    
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws`;
+    
+    if (socket && socket.readyState !== WebSocket.CLOSED) {
+        console.log('Closing existing connection before reconnecting');
+        socket.close();
+    }
+    
+    console.log('Attempting to connect to:', wsUrl);
+    socket = new WebSocket(wsUrl);
+    
+    socket.onopen = () => {
+        console.log('Connected to server');
+        isReconnecting = false;
+        reconnectAttempts = 0;
+        // Process any queued inputs
+        flushInputQueue();
+    };
+    
+    socket.onmessage = (event) => {
+        try {
+            const data = JSON.parse(event.data);
+            if (data.type === 'player_number') {
+                playerNumber = data.number;
+                document.getElementById('player_number').textContent = `Player ${playerNumber}`;
+                console.log('Assigned player number:', playerNumber);
+            }
+        } catch (err) {
+            console.error('Error processing message:', err);
+        }
+    };    socket.onclose = (event) => {
+        console.log('WebSocket closed:', event.code, event.reason);
+        playerNumber = null;
+        
+        if (event.code === 1000 && event.reason === 'reset') {
+            console.log('Controller was reset');
+            document.getElementById('player_number').textContent = 'Disconnected';
+            wasReset = true;  // Set reset flag
+            isReconnecting = false;
+            reconnectAttempts = 0;
+            // Prevent any future connection attempts until page refresh
+            socket = null;
+            return;
+        }
+        
+        // Only handle unexpected disconnects (like network issues)
+        if (event.code !== 1000) {
+            document.getElementById('player_number').textContent = 'Disconnected';
+        }
+    };
+    
+    socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
+}
+
+function queueInput(action) {
+    // Ignore inputs if we were reset, not connected, or don't have a player number
+    if (wasReset || !socket || socket.readyState !== WebSocket.OPEN || playerNumber === null) {
+        console.log('Ignoring input - reset, not connected, or no player number');
+        return;
+    }
+
+    inputQueue.push({
+        action: action,
+        timestamp: performance.now()
+    });
+    
+    // Send immediately for certain actions
+    if (action.includes('CENTER') || action.includes('BUTTON')) {
+        flushInputQueue();
+        return;
+    }
+    
+    // For movement actions, batch them
+    if (inputQueue.length >= 3) {
+        flushInputQueue();
+    } else {
+        const now = performance.now();
+        if (now - lastSendTime >= MIN_SEND_INTERVAL) {
+            flushInputQueue();
+        }
+    }
+}
+
+function flushInputQueue() {
+    if (inputQueue.length === 0) return;
+    
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        try {
+            // Send all queued inputs in a batch
+            const batch = {
+                type: 'input_batch',
+                actions: inputQueue.map(item => item.action)
+            };
+            socket.send(JSON.stringify(batch));
+            
+            // Handle vibration for the most recent action
+            if (!isIOS() && navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            // Clear the queue
+            inputQueue.length = 0;
+            lastSendTime = performance.now();
+        } catch (err) {
+            console.error('Error sending inputs:', err);
+        }
+    }
+}
+
+// Set up periodic queue flushing to ensure inputs don't get stuck
+setInterval(flushInputQueue, MIN_SEND_INTERVAL);
+
+// Only attempt initial connection if this is a fresh page load
+if (!wasReset) {
+    setupWebSocket();
+}
+
+// Helper function to detect iOS devices
+function isIOS() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+// Direction constants
+const DIRECTIONS = {
+    CENTER: "-CENTER",
+    UP: "DUP",
+    RIGHT: "DRIGHT",
+    DOWN: "DDOWN",
+    LEFT: "DLEFT",
+    UP_RIGHT: "DUP-DRIGHT",
+    UP_LEFT: "DUP-DLEFT",
+    DOWN_RIGHT: "DDOWN-DRIGHT",
+    DOWN_LEFT: "DDOWN-DLEFT"
+};
+
+const createThumbstick = (thumbstickId, thumbstickInnerId) => {
+    const thumbstick = document.getElementById(thumbstickId);
+    const thumbstickInner = document.getElementById(thumbstickInnerId);
+    const isRightStick = thumbstickId === 'right-thumbstick';
+    
+    let activeTouchId = null;
+    let startX, startY;
+    let currentDirection = DIRECTIONS.CENTER;
+    let lastActionTime = 0;
+    const deadzone = 0.3;
+    const diagonalThreshold = 0.5;
+    const cardinalThreshold = 0.7;
+    const minInterval = 16;
+
+    function determineDirection(normalizedX, normalizedY) {
+        const absX = Math.abs(normalizedX);
+        const absY = Math.abs(normalizedY);
+        const distance = Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY);
+        
+        if (distance < deadzone) {
+            return DIRECTIONS.CENTER;
+        }
+
+        // Calculate angle in degrees (0-360)
+        let angle = Math.atan2(normalizedY, normalizedX) * 180 / Math.PI;
+        if (angle < 0) angle += 360;
+
+        // Define 45-degree sectors for direction detection
+        // Each cardinal direction gets a 60-degree sector (±30°)
+        // Diagonals get 30-degree sectors (±15°)
+        
+        if (angle >= 330 || angle < 30) return DIRECTIONS.RIGHT;        // Right
+        if (angle >= 30 && angle < 60) return DIRECTIONS.DOWN_RIGHT;    // Down-Right
+        if (angle >= 60 && angle < 120) return DIRECTIONS.DOWN;         // Down
+        if (angle >= 120 && angle < 150) return DIRECTIONS.DOWN_LEFT;   // Down-Left
+        if (angle >= 150 && angle < 210) return DIRECTIONS.LEFT;        // Left
+        if (angle >= 210 && angle < 240) return DIRECTIONS.UP_LEFT;     // Up-Left
+        if (angle >= 240 && angle < 300) return DIRECTIONS.UP;          // Up
+        return DIRECTIONS.UP_RIGHT;                                     // Up-Right (300-330)
+    }
+
+    function updateStick(clientX, clientY) {
+        if (activeTouchId === null) return;
+
+        const now = performance.now();
+        if (now - lastActionTime < minInterval) return;
+
+        const rect = thumbstick.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        // Calculate deltas from center
+        const deltaX = clientX - centerX;
+        const deltaY = clientY - centerY;
+        const maxRadius = Math.min(rect.width, rect.height) * 0.4;
+
+        // Calculate distance from center
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+        // Normalize coordinates to -1 to 1 range
+        let normalizedX = deltaX / maxRadius;
+        let normalizedY = deltaY / maxRadius;
+
+        // Clamp to unit circle while preserving direction
+        if (distance > maxRadius) {
+            normalizedX = deltaX / distance;
+            normalizedY = deltaY / distance;
+        }
+
+        // Calculate visual position
+        let visualX = deltaX;
+        let visualY = deltaY;
+        
+        // Clamp visual position to maxRadius
+        if (distance > maxRadius) {
+            visualX = (deltaX / distance) * maxRadius;
+            visualY = (deltaY / distance) * maxRadius;
+        }
+
+        // Update visual position with smooth transition
+        thumbstickInner.style.transition = 'transform 0.1s ease-out';
+        thumbstickInner.style.transform = `translate(calc(-50% + ${visualX}px), calc(-50% + ${visualY}px))`;
+
+        // Determine and send direction
+        const direction = determineDirection(normalizedX, normalizedY);
+        if (direction !== currentDirection || now - lastActionTime >= minInterval) {
+            currentDirection = direction;
+            lastActionTime = now;
+            const action = `${isRightStick ? 'right' : 'left'}-thumbstick_${direction}`;
+            console.log(`${isRightStick ? 'Right' : 'Left'} stick: ${direction} (${normalizedX.toFixed(2)}, ${normalizedY.toFixed(2)})`);
+            sendAction(action);
+        }
+    }
+
+    function start(clientX, clientY, id) {
+        if (activeTouchId === null) {
+            activeTouchId = id;
+            const rect = thumbstick.getBoundingClientRect();
+            startX = rect.left + rect.width / 2;
+            startY = rect.top + rect.height / 2;
+            updateStick(clientX, clientY);
+        }
+    }
+
+    function end(id) {
+        if (activeTouchId === id) {
+            activeTouchId = null;
+            currentDirection = DIRECTIONS.CENTER;
+            thumbstickInner.style.transform = 'translate(-50%, -50%)';
+            const action = `${isRightStick ? 'right' : 'left'}-thumbstick_${DIRECTIONS.CENTER}`;
+            console.log(`${isRightStick ? 'Right' : 'Left'} stick centered`);
+            sendAction(action);
+        }
+    }
+
+    // Touch events
+    thumbstick.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.changedTouches[0];
+        start(touch.clientX, touch.clientY, touch.identifier);
+    });
+
+    thumbstick.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        for (const touch of e.changedTouches) {
+            if (touch.identifier === activeTouchId) {
+                updateStick(touch.clientX, touch.clientY);
+                break;
+            }
+        }
+    });
+
+    thumbstick.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        for (const touch of e.changedTouches) {
+            if (touch.identifier === activeTouchId) {
+                end(touch.identifier);
+                break;
+            }
+        }
+    });
+
+    // Mouse events
+    thumbstick.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        start(e.clientX, e.clientY, 'mouse');
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (activeTouchId === 'mouse') {
+            updateStick(e.clientX, e.clientY);
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (activeTouchId === 'mouse') {
+            end('mouse');
+        }
+    });
+};
+
+createThumbstick('left-thumbstick', 'left-thumbstick-inner');
+createThumbstick('right-thumbstick', 'right-thumbstick-inner');
+
+
+document.addEventListener('dblclick', function(e) {
+	e.preventDefault();
+});
+
+document.addEventListener("selectionchange", () => {
+	if (window.getSelection) {
+		window.getSelection().removeAllRanges();
+	}
+});
+document.addEventListener("contextmenu", (event) => {
+	event.preventDefault();
+});
+
+// Button event handlers
+function setupButton(elementId, buttonName) {
+	const button = document.getElementById(elementId);
+	
+	// Mouse events
+	button.addEventListener('mousedown', () => {
+		sendAction(`${buttonName}_BUTTON`);
+	});
+	
+	button.addEventListener('mouseup', () => {
+		sendAction(`${buttonName}_BUTTON_RELEASE`);
+	});
+	
+	button.addEventListener('mouseleave', () => {
+		sendAction(`${buttonName}_BUTTON_RELEASE`);
+	});
+	
+	// Touch events
+	button.addEventListener('touchstart', (e) => {
+		e.preventDefault(); // Prevent mouse events from firing
+		sendAction(`${buttonName}_BUTTON`);
+	});
+	
+	button.addEventListener('touchend', (e) => {
+		e.preventDefault(); // Prevent mouse events from firing
+		sendAction(`${buttonName}_BUTTON_RELEASE`);
+	});
+	
+	button.addEventListener('touchcancel', (e) => {
+		e.preventDefault(); // Prevent mouse events from firing
+		sendAction(`${buttonName}_BUTTON_RELEASE`);
+	});
+}
+
+		// Setup all buttons
+		setupButton('a-button', 'A');
+		setupButton('b-button', 'B');
+    	setupButton('x-button', 'X');
+		setupButton('y-button', 'Y');
+    	setupButton('up-button', 'UP');
+		setupButton('down-button', 'DOWN');
+    	setupButton('left-button', 'LEFT');
+		setupButton('right-button', 'RIGHT');
+        setupButton('l1-button', 'L1');
+        setupButton('l2-button', 'L2');
+        setupButton('l3-button', 'L3');
+        setupButton('r1-button', 'R1');
+        setupButton('r2-button', 'R2');
+        setupButton('r3-button', 'R3');
+		setupButton('start-button', 'START');
+        setupButton('select-button', 'SELECT');
+        setupButton('menu-button', 'GUIDE');
+</script>
+	
+</body></html>
