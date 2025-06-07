@@ -1,6 +1,6 @@
 # PartyPad
 
-A cross-platform web-based gamepad controller that allows you to use your phone or tablet as a game controller on Windows and Linux.
+A cross-platform web-based gamepad controller that allows you to use your phone or tablet as a game controller on Windows and Linux.  Mostly vibe-coded so use at your own risk.
 
 ## Features
 
