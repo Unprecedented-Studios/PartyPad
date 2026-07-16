@@ -166,6 +166,17 @@ EOF
 chmod +x "$DESKTOP_FILE"
 echo "Desktop launcher created: $DESKTOP_FILE"
 
+# --- Create run.sh ---
+echo ""
+echo "Creating run.sh..."
+cat > "$SCRIPT_DIR/run.sh" << EOF
+#!/usr/bin/env bash
+cd "\$(dirname "\${BASH_SOURCE[0]}")"
+exec $PYTHON app.py "\$@"
+EOF
+chmod +x "$SCRIPT_DIR/run.sh"
+echo "run.sh created"
+
 # --- Done ---
 echo ""
 echo -e "${GREEN}========================================${NC}"
@@ -173,7 +184,7 @@ echo -e "${GREEN}  PartyPad installation complete!${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo ""
 echo "To run PartyPad:"
-echo "  cd $SCRIPT_DIR && $PYTHON app.py"
+echo "  $SCRIPT_DIR/run.sh"
 echo ""
 echo "Or find PartyPad in your application menu."
 echo "For Steam Deck game mode, see: $SCRIPT_DIR/partypad-game.sh"
