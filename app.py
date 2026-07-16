@@ -1,17 +1,55 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-import platform
-import asyncio
+import argparse
 import json
-import tkinter as tk
-from tkinter import ttk
-import qrcode
-from PIL import Image, ImageTk
+import os
+import pathlib
+import asyncio
 import socket
 import threading
 
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
 from gamepad import create_gamepad
+
+def load_config():
+    defaults = {
+        "host": "0.0.0.0",
+        "port": 8000,
+        "max_players": 4,
+        "headless": False,
+    }
+    config = dict(defaults)
+
+    config_path = pathlib.Path(__file__).parent / "config.json"
+    if config_path.exists():
+        try:
+            with open(config_path) as f:
+                file_config = json.load(f)
+                config.update(file_config)
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    parser = argparse.ArgumentParser(description="PartyPad - Web-based game controller server")
+    parser.add_argument("--host", default=None, help=f"Host to bind (default: {config['host']})")
+    parser.add_argument("--port", type=int, default=None, help=f"Port to bind (default: {config['port']})")
+    parser.add_argument("--max-players", type=int, default=None, help=f"Max players (default: {config['max_players']})")
+    parser.add_argument("--headless", action="store_true", default=None, help="Run without GUI window")
+    parser.add_argument("--no-headless", action="store_false", dest="headless", default=None, help="Force GUI window")
+    args = parser.parse_args()
+
+    if args.host is not None:
+        config["host"] = args.host
+    if args.port is not None:
+        config["port"] = args.port
+    if args.max_players is not None:
+        config["max_players"] = args.max_players
+    if args.headless is not None:
+        config["headless"] = args.headless
+
+    return config
+
+CONFIG = load_config()
 
 # Simple button mapping that both platforms will understand
 class GamepadButton:
@@ -26,8 +64,8 @@ BUTTON_MAP = {
     'Y': GamepadButton('XUSB_GAMEPAD_Y'),
     'START': GamepadButton('XUSB_GAMEPAD_START'),
     'SELECT': GamepadButton('XUSB_GAMEPAD_BACK'),
-    'L2': GamepadButton('XUSB_GAMEPAD_LEFT_SHOULDER'),
-    'R2': GamepadButton('XUSB_GAMEPAD_RIGHT_SHOULDER'),
+    'L1': GamepadButton('XUSB_GAMEPAD_LEFT_SHOULDER'),
+    'R1': GamepadButton('XUSB_GAMEPAD_RIGHT_SHOULDER'),
     'L3': GamepadButton('XUSB_GAMEPAD_LEFT_THUMB'),
     'R3': GamepadButton('XUSB_GAMEPAD_RIGHT_THUMB'),
     'GUIDE': GamepadButton('XUSB_GAMEPAD_GUIDE'),
@@ -64,12 +102,27 @@ class GamepadManager:
             self.stick_states.pop(player_number, None)
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
-manager = GamepadManager()
+BASE_DIR = pathlib.Path(__file__).parent
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
+manager = GamepadManager(max_players=CONFIG["max_players"])
 
 @app.get("/")
 async def get_root():
-    return FileResponse('static/index.html')
+    return FileResponse(str(BASE_DIR / "static" / "index.html"))
+
+@app.get("/qr")
+async def get_qr():
+    url = f"http://{get_local_ip()}:{CONFIG['port']}"
+    from fastapi.responses import Response
+    return Response(content=generate_qr_image_bytes(url), media_type="image/png")
+
+@app.get("/api/info")
+async def get_info():
+    return {
+        "url": f"http://{get_local_ip()}:{CONFIG['port']}",
+        "connected_players": len(manager.active_players),
+        "max_players": CONFIG["max_players"],
+    }
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -130,9 +183,9 @@ async def websocket_endpoint(websocket: WebSocket):
                         button_type = parts[0]
                         is_release = 'RELEASE' in action
                         
-                        if 'R1' in button_type or 'L1' in button_type:
+                        if 'R2' in button_type or 'L2' in button_type:
                             value = 0 if is_release else 255
-                            if 'L1' in button_type:
+                            if 'L2' in button_type:
                                 gamepad.left_trigger(value=value)
                             else:
                                 gamepad.right_trigger(value=value)
@@ -170,13 +223,31 @@ def get_local_ip():
     except:
         return "localhost"
 
-def generate_qr_code(url, size=200):
-    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+if not CONFIG["headless"]:
+    import tkinter as tk
+    from tkinter import ttk
+    import qrcode
+    from PIL import Image, ImageTk
+
+    def generate_qr_code(url, size=200):
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(url)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        img = img.resize((size, size))
+        return ImageTk.PhotoImage(img)
+
+def generate_qr_image_bytes(url, size=200):
+    import qrcode as qrlib
+    qr = qrlib.QRCode(version=1, box_size=10, border=5)
     qr.add_data(url)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
     img = img.resize((size, size))
-    return ImageTk.PhotoImage(img)
+    import io
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
 
 class ControllerUI:
     def __init__(self, gamepad_manager):
@@ -200,7 +271,7 @@ class ControllerUI:
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         
         # IP Address display
-        self.ip_address = f"http://{get_local_ip()}:8000"
+        self.ip_address = f"http://{get_local_ip()}:{CONFIG['port']}"
         ip_label = ttk.Label(main_frame, text="Connect to:", font=('Helvetica', 12))
         ip_label.grid(row=0, column=0, pady=5)
         ip_value = ttk.Label(main_frame, text=self.ip_address, font=('Helvetica', 12, 'bold'))
@@ -258,12 +329,9 @@ class ControllerUI:
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
     
     def on_closing(self):
-        # Clean up all controllers before exit
         for player_num in list(self.manager.active_players):
             self.manager.cleanup_player(player_num)
         self.root.quit()
-        # Force stop the program
-        import os
         os._exit(0)
     
     def run(self):
@@ -271,7 +339,7 @@ class ControllerUI:
         self.root.mainloop()
 
 async def run_server():
-    config = uvicorn.Config(app, host="0.0.0.0", port=8000, loop="asyncio")
+    config = uvicorn.Config(app, host=CONFIG["host"], port=CONFIG["port"], loop="asyncio")
     server = uvicorn.Server(config)
     await server.serve()
 
@@ -282,13 +350,16 @@ def run_ui():
 if __name__ == "__main__":
     import uvicorn
     import warnings
-    
-    # Suppress the tracemalloc warning
+
     warnings.filterwarnings("ignore", category=RuntimeWarning, message=".*Enable tracemalloc.*")
-    
-    # Start the UI in a separate thread
-    ui_thread = threading.Thread(target=run_ui, daemon=True)
-    ui_thread.start()
-    
-    # Run the FastAPI server in the main thread
+
+    url = f"http://{get_local_ip()}:{CONFIG['port']}"
+    print(f"PartyPad server starting at {url}")
+
+    if CONFIG["headless"]:
+        print("Running in headless mode (no GUI window)")
+    else:
+        ui_thread = threading.Thread(target=run_ui, daemon=True)
+        ui_thread.start()
+
     asyncio.run(run_server())

@@ -6,9 +6,4 @@ python-uinput>=0.11.2; sys_platform == 'linux'
 pillow>=10.0.0
 qrcode>=7.4.2
 websockets>=11.0.3
-packaging>=23.1
-psutil>=5.9.5
-# Optional: For development and building
-pyinstaller>=5.13.0; sys_platform == 'win32'
-# tkinter is required for the UI, but must be installed via your system package manager on Linux:
-# sudo apt-get install python3-tk python3-pil python3-pil.imagetk
+pyinstaller>=5.13.0

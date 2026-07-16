@@ -36,10 +36,71 @@ document.addEventListener('dblclick', function(e) {
 			background-color: #222;
 			color: #fff;
 			display: flex;
+			flex-direction: column;
 			justify-content: center;
 			align-items: center;
 			height: 100vh;
 			overflow: hidden; /* Prevent scrolling */
+		}
+		#connection-info {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			padding: 8px 16px;
+			background: #333;
+			border-radius: 8px;
+			margin-bottom: 8px;
+			flex-shrink: 0;
+		}
+		#connection-info .qr-small {
+			width: 48px;
+			height: 48px;
+		}
+		#connection-info .info-text {
+			font-size: 14px;
+		}
+		#connection-info .url {
+			font-weight: bold;
+			font-size: 16px;
+			color: #7af;
+		}
+		#connection-info .copy-btn {
+			background: #555;
+			color: #fff;
+			border: none;
+			border-radius: 4px;
+			padding: 4px 10px;
+			cursor: pointer;
+			font-size: 12px;
+		}
+		#connection-info .copy-btn:active {
+			background: #777;
+		}
+		#connection-banner {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 24px;
+			padding: 16px;
+			background: #2a2a2a;
+			border-radius: 12px;
+			margin-bottom: 12px;
+			flex-shrink: 0;
+		}
+		#connection-banner .qr-large {
+			width: 120px;
+			height: 120px;
+		}
+		#connection-banner .instructions {
+			text-align: left;
+			font-size: 16px;
+			line-height: 1.5;
+		}
+		#connection-banner .instructions .big-url {
+			font-size: 24px;
+			font-weight: bold;
+			color: #7af;
+			display: block;
 		}
 		.container {
 			display: flex;
@@ -271,7 +332,13 @@ document.addEventListener('dblclick', function(e) {
 </style>
 	
 	</head><body>
-		
+		<div id="connection-banner">
+			<img id="qr-image" class="qr-large" src="" alt="QR Code" />
+			<div class="instructions">
+				Scan QR code to connect<br />
+				or visit: <span id="server-url" class="big-url">loading...</span>
+			</div>
+		</div>
 	 <div class="container">
 		<div id="player_number">Player 1</div>
 		 <div class="thumbstick left-thumbstick" id="left-thumbstick">
@@ -300,6 +367,19 @@ document.addEventListener('dblclick', function(e) {
 
 		<script>
 			
+// Load server info and QR code
+async function loadServerInfo() {
+	try {
+		const resp = await fetch('/api/info');
+		const info = await resp.json();
+		document.getElementById('server-url').textContent = info.url;
+		document.getElementById('qr-image').src = '/qr';
+	} catch (e) {
+		document.getElementById('server-url').textContent = window.location.origin;
+		document.getElementById('qr-image').src = '/qr';
+	}
+}
+
 // Add WebSocket management at the top of the script section
 let socket;
 let reconnectAttempts = 0;
@@ -334,13 +414,14 @@ function setupWebSocket() {
     console.log('Attempting to connect to:', wsUrl);
     socket = new WebSocket(wsUrl);
     
-    socket.onopen = () => {
-        console.log('Connected to server');
-        isReconnecting = false;
-        reconnectAttempts = 0;
-        // Process any queued inputs
-        flushInputQueue();
-    };
+	socket.onopen = () => {
+		console.log('Connected to server');
+		isReconnecting = false;
+		reconnectAttempts = 0;
+		document.getElementById('connection-banner').style.display = 'none';
+		// Process any queued inputs
+		flushInputQueue();
+	};
     
     socket.onmessage = (event) => {
         try {
@@ -356,6 +437,7 @@ function setupWebSocket() {
     };    socket.onclose = (event) => {
         console.log('WebSocket closed:', event.code, event.reason);
         playerNumber = null;
+        document.getElementById('connection-banner').style.display = 'flex';
         
         if (event.code === 1000 && event.reason === 'reset') {
             console.log('Controller was reset');
@@ -438,6 +520,7 @@ function flushInputQueue() {
 setInterval(flushInputQueue, MIN_SEND_INTERVAL);
 
 // Only attempt initial connection if this is a fresh page load
+loadServerInfo();
 if (!wasReset) {
     setupWebSocket();
 }

@@ -17,3 +17,8 @@ ENV/
 *.bak
 *.bak[0-9]
 *.new
+
+# PyInstaller
+dist/
+build/
+*.spec
