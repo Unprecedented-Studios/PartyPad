@@ -48,8 +48,8 @@ class LinuxGamepad(GamepadInterface):
         button_map = {
             "XUSB_GAMEPAD_A": uinput.BTN_A,
             "XUSB_GAMEPAD_B": uinput.BTN_B,
-            "XUSB_GAMEPAD_X": uinput.BTN_X,
-            "XUSB_GAMEPAD_Y": uinput.BTN_Y,
+            "XUSB_GAMEPAD_X": uinput.BTN_Y,
+            "XUSB_GAMEPAD_Y": uinput.BTN_X,
             "XUSB_GAMEPAD_START": uinput.BTN_START,
             "XUSB_GAMEPAD_BACK": uinput.BTN_SELECT,
             "XUSB_GAMEPAD_LEFT_THUMB": uinput.BTN_THUMBL,
@@ -78,8 +78,8 @@ class LinuxGamepad(GamepadInterface):
         button_map = {
             "XUSB_GAMEPAD_A": uinput.BTN_A,
             "XUSB_GAMEPAD_B": uinput.BTN_B,
-            "XUSB_GAMEPAD_X": uinput.BTN_X,
-            "XUSB_GAMEPAD_Y": uinput.BTN_Y,
+            "XUSB_GAMEPAD_X": uinput.BTN_Y,
+            "XUSB_GAMEPAD_Y": uinput.BTN_X,
             "XUSB_GAMEPAD_START": uinput.BTN_START,
             "XUSB_GAMEPAD_BACK": uinput.BTN_SELECT,
             "XUSB_GAMEPAD_LEFT_THUMB": uinput.BTN_THUMBL,
