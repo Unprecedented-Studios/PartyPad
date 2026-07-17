@@ -19,7 +19,6 @@ ENV/
 *.new
 
 # PyInstaller
-dist/
 build/
 *.spec
 

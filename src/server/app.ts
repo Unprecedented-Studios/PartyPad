@@ -11,6 +11,10 @@ export function createApp(config: AppConfig, manager: GamepadManager): express.A
 
   app.use('/static', express.static(staticDir));
 
+  app.get('/favicon.png', (_req, res) => {
+    res.sendFile(path.join(staticDir, 'favicon.png'));
+  });
+
   app.get('/', (_req, res) => {
     res.sendFile(path.join(staticDir, 'index.html'));
   });

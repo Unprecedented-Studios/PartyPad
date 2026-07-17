@@ -337,7 +337,7 @@ document.addEventListener('dblclick', function(e) {
 	</head><body>
 		<div id="connection-banner">
 			<div class="instructions">
-			Disconnected.  Refresh to try to reconnect.
+			Connecting to server...
 			</div>
 		</div>
 	 <div class="container">
@@ -368,20 +368,7 @@ document.addEventListener('dblclick', function(e) {
 
 		<script>
 			
-// Load server info and QR code
-async function loadServerInfo() {
-	try {
-		const resp = await fetch('/api/info');
-		const info = await resp.json();
-		document.getElementById('server-url').textContent = info.url;
-		document.getElementById('qr-image').src = '/qr';
-	} catch (e) {
-		document.getElementById('server-url').textContent = window.location.origin;
-		document.getElementById('qr-image').src = '/qr';
-	}
-}
-
-// Add WebSocket management at the top of the script section
+// WebSocket management
 let socket;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;
@@ -521,7 +508,6 @@ function flushInputQueue() {
 setInterval(flushInputQueue, MIN_SEND_INTERVAL);
 
 // Only attempt initial connection if this is a fresh page load
-loadServerInfo();
 if (!wasReset) {
     setupWebSocket();
 }
