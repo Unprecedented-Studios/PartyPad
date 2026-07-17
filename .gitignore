@@ -22,3 +22,21 @@ ENV/
 dist/
 build/
 *.spec
+
+# Node.js
+node_modules/
+dist/
+release/
+.electron-cache/
+
+# IDE
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

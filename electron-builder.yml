@@ -1,0 +1,33 @@
+appId: com.partypad.app
+productName: PartyPad
+copyright: Unprecedented Studios, LLC
+
+directories:
+  output: release
+
+files:
+  - dist/**/*
+  - static/**/*
+  - config.json
+  - package.json
+
+extraResources:
+  - from: static
+    to: static
+  - from: config.json
+    to: config.json
+
+linux:
+  target:
+    - AppImage
+  category: Game
+  icon: static/icon.png
+  synopsis: Web-based virtual game controller
+  description: >
+    PartyPad is a web-based virtual game controller server.
+    Friends connect their phones as controllers via a web page.
+    The app converts web inputs into virtual Xbox controller
+    actions that any game can use.
+
+electronDownload:
+  cache: .electron-cache

@@ -1,0 +1,28 @@
+{
+  "name": "partypad",
+  "version": "2.0.0",
+  "description": "Web-based virtual game controller for Steam Deck",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "electron dist/main.js",
+    "headless": "node dist/main.js --headless",
+    "dev": "tsc && electron dist/main.js",
+    "package": "electron-builder --linux",
+    "package:dir": "electron-builder --linux --dir"
+  },
+  "dependencies": {
+    "electron": "^43.1.1",
+    "express": "^4.21.0",
+    "koffi": "^3.1.1",
+    "qrcode": "^1.5.4",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/ws": "^8.5.12",
+    "electron-builder": "^26.15.3",
+    "typescript": "^5.6.0"
+  }
+}
