@@ -1,6 +1,8 @@
 appId: com.partypad.app
 productName: PartyPad
 copyright: Unprecedented Studios, LLC
+executableName: partypad
+asar: false
 
 directories:
   output: release

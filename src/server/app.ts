@@ -5,9 +5,18 @@ import { GamepadManager } from './manager';
 import { AppConfig } from '../types';
 import { getLocalIP } from './util';
 
+function getStaticDir(): string {
+  try {
+    if (require('electron').app?.isPackaged) {
+      return path.join((process as any).resourcesPath, 'static');
+    }
+  } catch {}
+  return path.join(__dirname, '..', '..', 'static');
+}
+
 export function createApp(config: AppConfig, manager: GamepadManager): express.Application {
   const app = express();
-  const staticDir = path.join(__dirname, '..', '..', 'static');
+  const staticDir = getStaticDir();
 
   app.use('/static', express.static(staticDir));
 

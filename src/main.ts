@@ -1,4 +1,6 @@
 import http from 'http';
+import fs from 'fs';
+fs.writeFileSync('/tmp/partypad-debug.log', 'main.ts started\n');
 import { loadConfig } from './config';
 import { createApp } from './server/app';
 import { setupWebSocket } from './server/ws';

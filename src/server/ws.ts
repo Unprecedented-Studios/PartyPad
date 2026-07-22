@@ -10,8 +10,8 @@ const BUTTON_MAP: Record<string, string> = {
   'Y': 'XUSB_GAMEPAD_Y',
   'START': 'XUSB_GAMEPAD_START',
   'SELECT': 'XUSB_GAMEPAD_BACK',
-  'L1': 'XUSB_GAMEPAD_LEFT_SHOULDER',
-  'R1': 'XUSB_GAMEPAD_RIGHT_SHOULDER',
+  'LB': 'XUSB_GAMEPAD_LEFT_SHOULDER',
+  'RB': 'XUSB_GAMEPAD_RIGHT_SHOULDER',
   'L3': 'XUSB_GAMEPAD_LEFT_THUMB',
   'R3': 'XUSB_GAMEPAD_RIGHT_THUMB',
   'GUIDE': 'XUSB_GAMEPAD_GUIDE',
@@ -102,9 +102,9 @@ function processAction(action: string, gamepad: GamepadInterface, ws: WebSocket,
     const buttonType = parts[0].toUpperCase();
     const isRelease = action.toUpperCase().includes('RELEASE');
 
-    if (buttonType === 'R2' || buttonType === 'L2') {
+    if (buttonType === 'RT' || buttonType === 'LT') {
       const value = isRelease ? 0 : 255;
-      if (buttonType === 'L2') {
+      if (buttonType === 'LT') {
         gamepad.leftTrigger(value);
       } else {
         gamepad.rightTrigger(value);

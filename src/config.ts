@@ -2,6 +2,15 @@ import path from 'path';
 import fs from 'fs';
 import { AppConfig } from './types';
 
+function getConfigPath(): string {
+  try {
+    if (require('electron').app?.isPackaged) {
+      return path.join((process as any).resourcesPath, 'config.json');
+    }
+  } catch {}
+  return path.join(__dirname, '..', 'config.json');
+}
+
 export function loadConfig(): AppConfig {
   const defaults: AppConfig = {
     host: '0.0.0.0',
@@ -12,7 +21,7 @@ export function loadConfig(): AppConfig {
 
   const config: AppConfig = { ...defaults };
 
-  const configPath = path.join(__dirname, '..', 'config.json');
+  const configPath = getConfigPath();
   if (fs.existsSync(configPath)) {
     try {
       const raw = fs.readFileSync(configPath, 'utf-8');
